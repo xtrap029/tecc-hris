@@ -76,7 +76,7 @@ trait AutoApplyPermissionCheck
 
         // Check employee role after specific permissions
         if ($user->hasRole(['employee'])) {
-            return $this->applyEmployeeRoleFiltering($query, $user, $permission = null, $module);
+            return $this->applyEmployeeRoleFiltering($query, $user, $module, $permission = null);
         }
 
         // Check Default manage Permission
@@ -101,7 +101,7 @@ trait AutoApplyPermissionCheck
     }
 
 
-    private function applyEmployeeRoleFiltering($query, $user, $permission = null, $module)
+    private function applyEmployeeRoleFiltering($query, $user, $module, $permission = null)
     {
         $module = str_replace('_', '-', $module);
 
