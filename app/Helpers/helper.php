@@ -1252,7 +1252,7 @@ if (!function_exists('isNotDeletableRoles')) {
     function isNotDeletableRoles()
     {
         $notDeletableRoles = [
-            'employee',
+            // 'employee',
             'hr',
         ];
 
