@@ -1,6 +1,6 @@
 import React from 'react';
 import { PageTemplate } from '@/components/page-template';
-import { RefreshCw, Users, Building2, Briefcase, UserPlus, Calendar, Clock, TrendingUp, BarChart3, Bell } from 'lucide-react';
+import { RefreshCw, Users, UserPlus, Calendar, Clock, TrendingUp, BarChart3, Bell } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -135,20 +135,6 @@ export default function Dashboard({ dashboardData }: { dashboardData: CompanyDas
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{t('Branches')}</p>
-                  <p className="mt-2 text-2xl font-bold">{stats.totalBranches}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{stats.totalDepartments} {t('departments')}</p>
-                </div>
-                <div className="rounded-full bg-green-100 p-3 dark:bg-green-900">
-                  <Building2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           <Card>
             <CardContent className="p-6">
@@ -180,20 +166,6 @@ export default function Dashboard({ dashboardData }: { dashboardData: CompanyDas
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{t('Active Jobs')}</p>
-                  <p className="mt-2 text-2xl font-bold">{stats.activeJobPostings}</p>
-                  <p className="text-xs text-green-600 mt-1">+{stats.jobPostsThisMonth} {t('this month')}</p>
-                </div>
-                <div className="rounded-full bg-orange-100 p-3 dark:bg-orange-900">
-                  <Briefcase className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           <Card>
             <CardContent className="p-6">
