@@ -9,14 +9,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Link, router, usePage } from '@inertiajs/react';
-import { LogOut, Settings, User } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export function ProfileMenu() {
   const { t } = useTranslation();
   const { auth } = usePage().props as any;
   const user = auth?.user;
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
   // Get avatar URL
   const getAvatarUrl = () => {
     // Show uploaded avatar from database
@@ -28,6 +32,11 @@ export function ProfileMenu() {
   };
 
   const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    setShowLogoutConfirm(false);
     router.post(route('logout'));
   };
 
@@ -40,6 +49,7 @@ export function ProfileMenu() {
     : 'U';
 
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="flex items-center gap-2 h-8 rounded-md">
@@ -76,5 +86,23 @@ export function ProfileMenu() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+
+    <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>{t("Log out")}</DialogTitle>
+          <DialogDescription>{t("Are you sure you want to logout?")}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={() => setShowLogoutConfirm(false)}>
+            {t("Cancel")}
+          </Button>
+          <Button variant="destructive" onClick={handleLogoutConfirm}>
+            {t("Log out")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
