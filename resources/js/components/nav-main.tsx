@@ -9,7 +9,7 @@ const STORAGE_KEY = 'nav_expanded_items';
 
 export function NavMain({ items = [], position }: { items: NavItem[]; position: 'left' | 'right' }) {
     const page = usePage();
-    const { state } = useSidebar();
+    const { state, setOpen, isMobile, setOpenMobile } = useSidebar();
     
     // Check if the document is in RTL mode
     const isRtl = document.documentElement.dir === 'rtl';
@@ -80,7 +80,16 @@ export function NavMain({ items = [], position }: { items: NavItem[]; position: 
         });
     };
     
+    const expandSidebar = () => {
+        if (isMobile) {
+            setOpenMobile(true);
+        } else if (state === 'collapsed') {
+            setOpen(true);
+        }
+    };
+
     const toggleExpand = (key: string, siblingKeys: string[] = []) => {
+        expandSidebar();
         const isCurrentlyOpen = expandedItems[key];
         const newExpandedItems = { ...expandedItems };
 
