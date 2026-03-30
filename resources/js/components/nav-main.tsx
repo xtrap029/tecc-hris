@@ -80,15 +80,20 @@ export function NavMain({ items = [], position }: { items: NavItem[]; position: 
         });
     };
     
-    const toggleExpand = (title: string) => {
-        const newExpandedItems = {
-            ...expandedItems,
-            [title]: !expandedItems[title]
-        };
-        
+    const toggleExpand = (key: string, siblingKeys: string[] = []) => {
+        const isCurrentlyOpen = expandedItems[key];
+        const newExpandedItems = { ...expandedItems };
+
+        // Close all siblings (accordion behaviour)
+        siblingKeys.forEach(sibling => {
+            newExpandedItems[sibling] = false;
+        });
+
+        // Toggle the clicked item
+        newExpandedItems[key] = !isCurrentlyOpen;
+
         setExpandedItems(newExpandedItems);
-        
-        // Save to localStorage
+
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newExpandedItems));
         } catch (e) {
@@ -113,6 +118,7 @@ export function NavMain({ items = [], position }: { items: NavItem[]; position: 
     };
     
     const renderSubMenu = (children: NavItem[], level: number = 1) => {
+        const siblingKeys = children.filter(c => c.children).map(c => `${level}-${c.title}`);
         return (
             <SidebarMenuSub>
                 {children.map(child => (
@@ -121,9 +127,9 @@ export function NavMain({ items = [], position }: { items: NavItem[]; position: 
                             // Nested submenu item with children
                             <>
                                 <SidebarMenuSubItem>
-                                    <SidebarMenuSubButton 
+                                    <SidebarMenuSubButton
                                         isActive={isChildActive(child.children)}
-                                        onClick={() => toggleExpand(`${level}-${child.title}`)}
+                                        onClick={() => toggleExpand(`${level}-${child.title}`, siblingKeys)}
                                     >
                                         <div className={`flex items-center gap-2 ${effectivePosition === 'right' ? 'justify-end text-right' : 'justify-start text-left'}`}>
                                             <span>{child.title}</span>
@@ -160,6 +166,8 @@ export function NavMain({ items = [], position }: { items: NavItem[]; position: 
         );
     };
     
+    const topLevelSiblingKeys = items.filter(i => i.children).map(i => i.title);
+
     return (
         <SidebarGroup className="px-1.5 py-0">
             <SidebarGroupLabel className={`flex w-full text-xs ${effectivePosition === 'right' ? 'justify-end' : 'justify-start'}`}>Platform</SidebarGroupLabel>
@@ -170,10 +178,10 @@ export function NavMain({ items = [], position }: { items: NavItem[]; position: 
                             // Parent item with children
                             <>
                                 <SidebarMenuItem>
-                                    <SidebarMenuButton 
-                                        isActive={isChildActive(item.children)} 
+                                    <SidebarMenuButton
+                                        isActive={isChildActive(item.children)}
                                         tooltip={{ children: item.title }}
-                                        onClick={() => toggleExpand(item.title)}
+                                        onClick={() => toggleExpand(item.title, topLevelSiblingKeys)}
                                     >
                                         <div className={`flex items-center gap-2 w-full ${effectivePosition === 'right' ? 'justify-end text-right' : 'justify-start text-left'}`}>
                                             {effectivePosition === 'right' ? (
