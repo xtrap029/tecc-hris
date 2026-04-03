@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Link, router, usePage } from '@inertiajs/react';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -89,16 +89,19 @@ export function ProfileMenu() {
 
     <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
       <DialogContent className="sm:max-w-sm">
-        <DialogHeader>
-          <DialogTitle>{t("Log out")}</DialogTitle>
-          <DialogDescription>{t("Are you sure you want to logout?")}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="gap-2">
+        <div className="flex flex-col items-center text-center gap-3 pt-2">
+          <AlertCircle className="h-20 w-20 text-red-500" />
+          <DialogHeader>
+            <DialogTitle className="text-center">{t("You're about to log out of TECC People.")}</DialogTitle>
+            <DialogDescription className="text-center">{t("Do you want to proceed?")}</DialogDescription>
+          </DialogHeader>
+        </div>
+        <DialogFooter className="gap-2 sm:justify-center">
           <Button variant="outline" onClick={() => setShowLogoutConfirm(false)}>
-            {t("Cancel")}
+            {t("Stay")}
           </Button>
           <Button variant="destructive" onClick={handleLogoutConfirm}>
-            {t("Log out")}
+            {t("Logout")}
           </Button>
         </DialogFooter>
       </DialogContent>
