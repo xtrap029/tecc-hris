@@ -64,8 +64,10 @@ export default function Login({ status, canResetPassword, demoBusinesses = [] }:
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         const formData = { ...data, recaptcha_token: recaptchaToken };
+        sessionStorage.setItem('justLoggedIn', '1');
         post(route('login'), formData, {
             onFinish: () => reset('password'),
+            onError: () => sessionStorage.removeItem('justLoggedIn'),
         });
     };
 

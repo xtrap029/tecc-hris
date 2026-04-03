@@ -1,4 +1,5 @@
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
+import WelcomeSplash from '@/components/welcome-splash';
 import { type BreadcrumbItem } from '@/types';
 import { type ReactNode } from 'react';
 import { useFavicon } from '@/hooks/use-favicon';
@@ -15,8 +16,11 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
     useBrandTheme();
     
     return (
-        <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
-            {children}
-        </AppLayoutTemplate>
+        <>
+            <WelcomeSplash />
+            <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
+                {children}
+            </AppLayoutTemplate>
+        </>
     );
 };
