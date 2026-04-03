@@ -9,24 +9,25 @@ interface AuthButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     children: React.ReactNode;
 }
 
-export default function AuthButton({ 
-    processing = false, 
-    tabIndex, 
-    children, 
-    className = '', 
-    disabled, 
-    ...props 
+export default function AuthButton({
+    processing = false,
+    tabIndex,
+    children,
+    className = '',
+    disabled,
+    style: styleProp,
+    ...props
 }: AuthButtonProps) {
     const { themeColor, customColor } = useBrand();
     const primaryColor = themeColor === 'custom' ? customColor : THEME_COLORS[themeColor as keyof typeof THEME_COLORS];
     return (
-        <button 
+        <button
             {...props}
-            type={props.type || 'submit'} 
+            type={props.type || 'submit'}
             className={`w-full text-white font-medium py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 ${className}`}
-            tabIndex={tabIndex} 
+            tabIndex={tabIndex}
             disabled={processing || disabled}
-            style={{ backgroundColor: primaryColor }}
+            style={{ backgroundColor: primaryColor, ...styleProp }}
         >
             {processing && <LoaderCircle className="h-4 w-4 animate-spin mr-2 inline" />}
             {children}
