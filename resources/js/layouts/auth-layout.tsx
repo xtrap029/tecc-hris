@@ -6,8 +6,6 @@ import { getImagePath } from '@/utils/helpers';
 import { Head } from '@inertiajs/react';
 import { CreditCard } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-
 interface AuthLayoutProps {
     children: ReactNode;
     title: string;
@@ -34,7 +32,6 @@ function hexToAdjustedRgba(hex, opacity = 1, adjust = 0) {
 
 export default function AuthLayout({ children, title, description, icon, status, statusType = 'success' }: AuthLayoutProps) {
     useFavicon();
-    const { t } = useTranslation();
     const [mounted, setMounted] = useState(false);
     const { logoLight, logoDark, themeColor, customColor } = useBrand();
     const { appearance } = useAppearance();
