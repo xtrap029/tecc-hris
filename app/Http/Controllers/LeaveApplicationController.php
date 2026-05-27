@@ -76,12 +76,14 @@ class LeaveApplicationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'employee_id' => 'required|exists:users,id',
+            'employee_id' => ['required', 'exists:users,id', \Illuminate\Validation\Rule::in([Auth::id()])],
             'leave_type_id' => 'required|exists:leave_types,id',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
             'reason' => 'required|string',
             'attachment' => 'nullable|string',
+        ], [
+            'employee_id.in' => __('You can only submit leave applications for yourself.'),
         ]);
 
         $validated['created_by'] = creatorId();

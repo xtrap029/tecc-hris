@@ -467,10 +467,7 @@ export default function LeaveApplications() {
               label: t('Employee'),
               type: 'select',
               required: true,
-              options: employees ? employees.map((emp: any) => ({
-                value: emp.id.toString(),
-                label: emp.name
-              })) : []
+              options: auth?.user ? [{ value: auth.user.id.toString(), label: auth.user.name }] : []
             },
             {
               name: 'leave_type_id',
