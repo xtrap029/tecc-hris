@@ -481,7 +481,7 @@ export default function LeaveApplications() {
             },
             { name: 'start_date', label: t('Start Date'), type: 'date', required: true },
             { name: 'end_date', label: t('End Date'), type: 'date', required: true },
-            { name: 'reason', label: t('Reason'), type: 'textarea', required: true },
+            { name: 'reason', label: t('Reason'), type: 'textarea', required: false },
             { 
               name: 'attachment', 
               label: t('Attachment'), 

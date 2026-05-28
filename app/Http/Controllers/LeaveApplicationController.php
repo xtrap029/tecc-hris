@@ -80,7 +80,7 @@ class LeaveApplicationController extends Controller
             'leave_type_id' => 'required|exists:leave_types,id',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'reason' => 'required|string',
+            'reason' => 'nullable|string',
             'attachment' => 'nullable|string',
         ], [
             'employee_id.in' => __('You can only submit leave applications for yourself.'),
@@ -178,7 +178,7 @@ class LeaveApplicationController extends Controller
                     'leave_type_id' => 'required|exists:leave_types,id',
                     'start_date' => 'required|date',
                     'end_date' => 'required|date|after_or_equal:start_date',
-                    'reason' => 'required|string',
+                    'reason' => 'nullable|string',
                     'attachment' => 'nullable|string',
                 ]);
 
