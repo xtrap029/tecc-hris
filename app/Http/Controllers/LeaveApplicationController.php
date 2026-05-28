@@ -80,6 +80,7 @@ class LeaveApplicationController extends Controller
             'leave_type_id' => 'required|exists:leave_types,id',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'day_period' => 'nullable|in:whole,am,pm',
             'reason' => 'nullable|string',
             'attachment' => 'nullable|string',
         ], [
@@ -91,7 +92,19 @@ class LeaveApplicationController extends Controller
         // Calculate total days
         $startDate = Carbon::parse($validated['start_date']);
         $endDate = Carbon::parse($validated['end_date']);
-        $validated['total_days'] = $startDate->diffInDays($endDate) + 1;
+        $isSameDay = $startDate->isSameDay($endDate);
+        $dayPeriod = $validated['day_period'] ?? 'whole';
+
+        if ($isSameDay && in_array($dayPeriod, ['am', 'pm'])) {
+            $validated['total_days'] = 0.5;
+        } else {
+            $validated['total_days'] = $startDate->diffInDays($endDate) + 1;
+        }
+
+        // Clear day_period if it's a multi-day application
+        if (!$isSameDay) {
+            $validated['day_period'] = null;
+        }
 
         // Get leave policy for this leave type
         $leavePolicy = LeavePolicy::where('leave_type_id', $validated['leave_type_id'])
@@ -178,6 +191,7 @@ class LeaveApplicationController extends Controller
                     'leave_type_id' => 'required|exists:leave_types,id',
                     'start_date' => 'required|date',
                     'end_date' => 'required|date|after_or_equal:start_date',
+                    'day_period' => 'nullable|in:whole,am,pm',
                     'reason' => 'nullable|string',
                     'attachment' => 'nullable|string',
                 ]);
@@ -185,7 +199,18 @@ class LeaveApplicationController extends Controller
                 // Calculate total days
                 $startDate = Carbon::parse($validated['start_date']);
                 $endDate = Carbon::parse($validated['end_date']);
-                $validated['total_days'] = $startDate->diffInDays($endDate) + 1;
+                $isSameDay = $startDate->isSameDay($endDate);
+                $dayPeriod = $validated['day_period'] ?? 'whole';
+
+                if ($isSameDay && in_array($dayPeriod, ['am', 'pm'])) {
+                    $validated['total_days'] = 0.5;
+                } else {
+                    $validated['total_days'] = $startDate->diffInDays($endDate) + 1;
+                }
+
+                if (!$isSameDay) {
+                    $validated['day_period'] = null;
+                }
 
                 // Get leave policy
                 $leavePolicy = LeavePolicy::where('leave_type_id', $validated['leave_type_id'])

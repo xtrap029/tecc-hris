@@ -15,6 +15,7 @@ class LeaveApplication extends BaseModel
         'leave_policy_id',
         'start_date',
         'end_date',
+        'day_period',
         'total_days',
         'reason',
         'attachment',

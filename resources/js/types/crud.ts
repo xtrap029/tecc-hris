@@ -93,6 +93,8 @@ export interface FormField {
   colSpan?: number; // Number of columns this field should span (1-12)
   width?: string; // CSS width value (e.g., '50%', '200px')
   row?: number; // Optional row number for grouping fields
+  defaultValue?: any;
+  helpText?: string;
   render?: (field: FormField, formData: any, onChange: (name: string, value: any) => void) => React.ReactNode;
   conditional?: (mode: string, formData: any) => boolean;
   dependentConfig?: Array<{

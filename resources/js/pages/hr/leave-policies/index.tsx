@@ -449,7 +449,7 @@ export default function LeavePolicies() {
             },
             { name: 'accrual_rate', label: t('Accrual Rate (Days)'), type: 'number', required: true, min: 0, step: 0.5 },
             { name: 'carry_forward_limit', label: t('Carry Forward Limit (Days)'), type: 'number', required: true, min: 0 },
-            { name: 'min_days_per_application', label: t('Min Days Per Application'), type: 'number', required: true, min: 1 },
+            { name: 'min_days_per_application', label: t('Min Days Per Application'), type: 'number', required: true, min: 0.5, step: 0.5 },
             { name: 'max_days_per_application', label: t('Max Days Per Application'), type: 'number', required: true, min: 1 },
             { name: 'requires_approval', label: t('Requires Approval'), type: 'checkbox', defaultValue: true },
             {

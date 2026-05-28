@@ -481,6 +481,19 @@ export default function LeaveApplications() {
             },
             { name: 'start_date', label: t('Start Date'), type: 'date', required: true },
             { name: 'end_date', label: t('End Date'), type: 'date', required: true },
+            {
+              name: 'day_period',
+              label: t('Day Period'),
+              type: 'select',
+              defaultValue: 'whole',
+              conditional: (_mode: string, formData: any) =>
+                !!formData.start_date && !!formData.end_date && formData.start_date === formData.end_date,
+              options: [
+                { value: 'whole', label: t('Whole Day') },
+                { value: 'am', label: t('AM Only') },
+                { value: 'pm', label: t('PM Only') },
+              ]
+            },
             { name: 'reason', label: t('Reason'), type: 'textarea', required: false },
             { 
               name: 'attachment', 
