@@ -1,8 +1,8 @@
 # HRIS — Developer Handoff
 
-**Date:** 2026-03-30
+**Date:** 2026-05-31
 **Branch:** `main`
-**Last commit:** `bfa58fd` — Sidebar accordion + auto-expand on click
+**Last commit:** `88eeb98` — Add leave approver system with approval info in view modal
 
 ---
 
@@ -31,58 +31,47 @@ Access the app at: `http://localhost/hris/public`
 
 ## Recent changes (this session)
 
-### 1. Sidebar collapsed by default
-**File:** `resources/js/components/app-shell.tsx:14`
-
-Changed the localStorage default so new users start with the sidebar folded.
-
-```diff
-- localStorage.getItem('sidebar') !== 'false' : true
-+ localStorage.getItem('sidebar') === 'true' : false
-```
-
-Users who have previously opened the sidebar retain their state via `localStorage['sidebar']`.
-
----
-
-### 2. Logout confirmation dialog
+### 1. Leave approver system
 **Files:**
-- `resources/js/components/user-menu-content.tsx`
-- `resources/js/components/profile-menu.tsx`
+- `database/migrations/2026_05_31_085431_add_approver_id_to_employees_table.php`
+- `app/Models/Employee.php`
+- `app/Http/Controllers/EmployeeController.php`
+- `resources/js/pages/hr/employees/create.tsx`
+- `resources/js/pages/hr/employees/edit.tsx`
+- `resources/js/pages/hr/employees/show.tsx`
 
-Both logout entry points now show a Dialog before proceeding:
-> "Are you sure you want to logout?"
-
-Uses the existing `Dialog` UI component (`resources/js/components/ui/dialog.tsx`).
-Cancel dismisses; **Log out** (destructive) calls `router.post(route('logout'))`.
+Each employee can have a designated leave approver (another user) set via a `approver_id` FK on the `employees` table. The approver is selected via a dropdown in the employee create/edit forms (with a "No Approver" option to clear). The approver's name is shown in the Employment tab of the employee view page.
 
 ---
 
-### 3. Sidebar accordion — one item open at a time
-**File:** `resources/js/components/nav-main.tsx`
+### 2. Approver scoping for leave applications
+**File:** `app/Traits/AutoApplyPermissionCheck.php`
 
-`toggleExpand` now accepts `siblingKeys: string[]`. When a parent item is opened, all siblings at the same level are closed first. Works at both the top level and nested sub-menus.
+Employees who are designated approvers now see the leave requests of employees they approve, in addition to their own. Fixed by moving the employee role check before the `manage-own-*` permission check, so `applyEmployeeRoleFiltering()` always handles query scoping for the employee role. The `LeaveApplication` case uses:
 
-Top-level sibling keys are computed once before the render:
-```ts
-const topLevelSiblingKeys = items.filter(i => i.children).map(i => i.title);
-```
-
-Nested sibling keys are computed inside `renderSubMenu` per level:
-```ts
-const siblingKeys = children.filter(c => c.children).map(c => `${level}-${c.title}`);
+```php
+$q->where('employee_id', $user->id)
+  ->orWhereHas('employee.employee', function ($subQ) use ($user) {
+      $subQ->where('approver_id', $user->id);
+  });
 ```
 
 ---
 
-### 4. Sidebar auto-expands when collapsed and an item is clicked
-**File:** `resources/js/components/nav-main.tsx`
+### 3. Approval info in leave application view modal
+**Files:**
+- `app/Http/Controllers/LeaveApplicationController.php`
+- `resources/js/pages/hr/leave-applications/index.tsx`
 
-When the sidebar is in icon/collapsed state, clicking any parent nav item now calls `expandSidebar()` which calls `setOpen(true)` (desktop) or `setOpenMobile(true)` (mobile) before toggling the submenu open.
+The view modal now shows an "Approval Info" section (view mode only):
+- **Approved/Rejected** → coloured box with who acted, timestamp, and manager comments
+- **Pending** → yellow box with the designated approver's name (or "No approver assigned")
+
+Eager loads `employee.employee.approver` in the index controller to supply the approver name.
 
 ---
 
-### 5. Agents folder (git-ignored)
+### 4. Agents folder (git-ignored)
 **Files:** `agents/assign_workers.php`, `agents/agents.md`
 
 Standalone PHP scripts that bootstrap Laravel and operate on the DB directly.
@@ -94,9 +83,8 @@ Not committed. See `agents/agents.md` for usage.
 
 | # | Issue | Notes |
 |---|-------|-------|
-| 1 | `package-lock.json` has uncommitted changes | Regenerated during `npm install`; safe to commit separately |
-| 2 | `nav-main.tsx` has uncommitted changes | Auto-expand sidebar feature — commit when ready |
-| 3 | Sidebar accordion doesn't close active item's parent on page navigation | Active item always stays open via `useEffect`; by design |
+| 1 | Sidebar accordion doesn't close active item's parent on page navigation | Active item always stays open via `useEffect`; by design |
+| 2 | HANDOFF.md hook fires only inside Claude Code sessions | Direct terminal commits won't auto-update it; update manually or add a git `post-commit` hook |
 
 ---
 
