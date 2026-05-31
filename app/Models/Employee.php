@@ -20,6 +20,7 @@ class Employee extends Model
         'designation_id',
         'shift_id',
         'attendance_policy_id',
+        'approver_id',
         'date_of_joining',
         'employment_type',
         'address_line_1',
@@ -94,6 +95,11 @@ class Employee extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approver_id');
     }
 
     /**

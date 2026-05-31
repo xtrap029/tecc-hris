@@ -16,7 +16,7 @@ class LeaveApplicationController extends Controller
     public function index(Request $request)
     {
         $query = LeaveApplication::withPermissionCheck()
-            ->with(['employee', 'leaveType', 'leavePolicy', 'approver', 'creator']);
+            ->with(['employee.employee.approver', 'leaveType', 'leavePolicy', 'approver', 'creator']);
 
         // Handle search
         if ($request->has('search') && !empty($request->search)) {

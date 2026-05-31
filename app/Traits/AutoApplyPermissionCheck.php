@@ -47,9 +47,15 @@ trait AutoApplyPermissionCheck
             }
         }
 
+        $module = str_replace('_', '-', $module);
+
+        // Employee role always uses model-specific filtering (handles approver scoping, etc.)
+        if ($user->hasRole(['employee'])) {
+            return $this->applyEmployeeRoleFiltering($query, $user, $module, $permission = null);
+        }
+
         try {
             // Check for specific permissions first (works for all roles)
-            $module = str_replace('_', '-', $module);
             if ($user->hasPermissionTo("manage-own-{$module}")) {
                 if (Schema::hasColumn($query->getModel()->getTable(), 'created_by')) {
                     return $query->where('created_by', $user->id);
@@ -72,11 +78,6 @@ trait AutoApplyPermissionCheck
                 }
                 return $query;
             }
-        }
-
-        // Check employee role after specific permissions
-        if ($user->hasRole(['employee'])) {
-            return $this->applyEmployeeRoleFiltering($query, $user, $module, $permission = null);
         }
 
         // Check Default manage Permission
@@ -189,7 +190,12 @@ trait AutoApplyPermissionCheck
             case 'App\Models\LeaveBalance':
                 return $query->where('employee_id', $user->id);
             case 'App\Models\LeaveApplication':
-                return $query->where('employee_id', $user->id);
+                return $query->where(function ($q) use ($user) {
+                    $q->where('employee_id', $user->id)
+                      ->orWhereHas('employee.employee', function ($subQ) use ($user) {
+                          $subQ->where('approver_id', $user->id);
+                      });
+                });
             case 'App\Models\AttendanceRecord':
                 return $query->where('employee_id', $user->id);
             case 'App\Models\AttendanceRegularization':

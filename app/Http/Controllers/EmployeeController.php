@@ -159,6 +159,10 @@ class EmployeeController extends Controller
             ->where('status', 'active')
             ->get(['id', 'name']);
 
+        $employees = User::where('type', 'employee')
+            ->whereIn('created_by', getCompanyAndUsersId())
+            ->get(['id', 'name']);
+
         return Inertia::render('hr/employees/create', [
             'branches' => $branches,
             'departments' => $departments,
@@ -166,6 +170,7 @@ class EmployeeController extends Controller
             'documentTypes' => $documentTypes,
             'shifts' => $shifts,
             'attendancePolicies' => $attendancePolicies,
+            'employees' => $employees,
         ]);
     }
 
@@ -188,6 +193,7 @@ class EmployeeController extends Controller
                 'profile_image' => 'required',
                 'shift_id' => 'nullable|exists:shifts,id',
                 'attendance_policy_id' => 'nullable|exists:attendance_policies,id',
+                'approver_id' => 'nullable|exists:users,id',
 
                 // Employment details
                 'branch_id' => 'required|exists:branches,id',
@@ -268,6 +274,7 @@ class EmployeeController extends Controller
             $employee->designation_id = $request->designation_id;
             $employee->date_of_joining = $request->date_of_joining;
             $employee->employment_type = $request->employment_type;
+            $employee->approver_id = $request->approver_id ?: null;
             $employee->address_line_1 = $request->address_line_1;
             $employee->address_line_2 = $request->address_line_2;
             $employee->city = $request->city;
@@ -326,7 +333,7 @@ class EmployeeController extends Controller
         }
 
         // Load user with employee relationships
-        $user = User::with(['employee.branch', 'employee.department', 'employee.designation', 'employee.shift', 'employee.attendancePolicy', 'employee.documents.documentType'])
+        $user = User::with(['employee.branch', 'employee.department', 'employee.designation', 'employee.shift', 'employee.attendancePolicy', 'employee.approver', 'employee.documents.documentType'])
             ->where('id', $employee->user_id)
             ->first();
 
@@ -377,6 +384,11 @@ class EmployeeController extends Controller
             ->where('status', 'active')
             ->get(['id', 'name']);
 
+        $employees = User::where('type', 'employee')
+            ->whereIn('created_by', getCompanyAndUsersId())
+            ->where('id', '!=', $user->id)
+            ->get(['id', 'name']);
+
         return Inertia::render('hr/employees/edit', [
             'employee' => $user,
             'branches' => $branches,
@@ -385,6 +397,7 @@ class EmployeeController extends Controller
             'documentTypes' => $documentTypes,
             'shifts' => $shifts,
             'attendancePolicies' => $attendancePolicies,
+            'employees' => $employees,
         ]);
     }
 
@@ -412,6 +425,7 @@ class EmployeeController extends Controller
                 'profile_image' => 'nullable|max:2048',
                 'shift_id' => 'nullable|exists:shifts,id',
                 'attendance_policy_id' => 'nullable|exists:attendance_policies,id',
+                'approver_id' => 'nullable|exists:users,id',
 
                 // Employment details
                 'branch_id' => 'required|exists:branches,id',
@@ -474,6 +488,7 @@ class EmployeeController extends Controller
             $employee->employee_id = $request->employee_id;
             $employee->shift_id = $request->shift_id;
             $employee->attendance_policy_id = $request->attendance_policy_id;
+            $employee->approver_id = $request->approver_id ?: null;
             $employee->phone = $request->phone;
             $employee->date_of_birth = $request->date_of_birth;
             $employee->gender = $request->gender;

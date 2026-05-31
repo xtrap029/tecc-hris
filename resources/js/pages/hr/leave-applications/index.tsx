@@ -321,7 +321,9 @@ export default function LeaveApplications() {
       action: 'approve',
       className: 'text-green-500',
       requiredPermission: 'approve-leave-applications',
-      condition: (item: any) => item.status === 'pending'
+      condition: (item: any) =>
+        item.status === 'pending' &&
+        (auth?.user?.type !== 'employee' || item.employee?.employee?.approver_id === auth?.user?.id)
     },
     {
       label: t('Reject'),
@@ -329,7 +331,9 @@ export default function LeaveApplications() {
       action: 'reject',
       className: 'text-red-500',
       requiredPermission: 'reject-leave-applications',
-      condition: (item: any) => item.status === 'pending'
+      condition: (item: any) =>
+        item.status === 'pending' &&
+        (auth?.user?.type !== 'employee' || item.employee?.employee?.approver_id === auth?.user?.id)
     },
     {
       label: t('Delete'),
@@ -495,9 +499,9 @@ export default function LeaveApplications() {
               ]
             },
             { name: 'reason', label: t('Reason'), type: 'textarea', required: false },
-            { 
-              name: 'attachment', 
-              label: t('Attachment'), 
+            {
+              name: 'attachment',
+              label: t('Attachment'),
               type: 'custom',
               render: (field, formData, handleChange) => (
                 <div>
@@ -509,6 +513,49 @@ export default function LeaveApplications() {
                 </div>
               ),
               helpText: t('Upload PDF, DOC, DOCX, JPG, JPEG, PNG files')
+            },
+            {
+              name: '_approval_info',
+              label: t('Approval Info'),
+              type: 'custom',
+              conditional: (mode: string) => mode === 'view',
+              render: (_field, formData) => {
+                const status = formData.status;
+                const approver = formData.approver;
+                const approvedAt = formData.approved_at;
+                const comments = formData.manager_comments;
+                const designatedApprover = formData.employee?.employee?.approver;
+
+                if (status === 'approved' || status === 'rejected') {
+                  return (
+                    <div className={`rounded-md p-3 text-sm space-y-1 ${status === 'approved' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                      <p className={`font-medium ${status === 'approved' ? 'text-green-700' : 'text-red-700'}`}>
+                        {status === 'approved' ? t('Approved by') : t('Rejected by')}: {approver?.name || t('Unknown')}
+                      </p>
+                      {approvedAt && (
+                        <p className="text-muted-foreground">
+                          {window.appSettings?.formatDateTime(approvedAt) || new Date(approvedAt).toLocaleString()}
+                        </p>
+                      )}
+                      {comments && (
+                        <p className="mt-1 italic">{t('Comments')}: {comments}</p>
+                      )}
+                    </div>
+                  );
+                }
+
+                // Pending
+                return (
+                  <div className="rounded-md p-3 text-sm bg-yellow-50 border border-yellow-200 space-y-1">
+                    <p className="font-medium text-yellow-700">{t('Awaiting approval')}</p>
+                    {designatedApprover ? (
+                      <p className="text-muted-foreground">{t('Approver')}: {designatedApprover.name}</p>
+                    ) : (
+                      <p className="text-muted-foreground">{t('No approver assigned')}</p>
+                    )}
+                  </div>
+                );
+              }
             }
           ],
           modalSize: 'lg'

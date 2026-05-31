@@ -18,7 +18,7 @@ import { getImagePath } from '@/utils/helpers';
 
 export default function EmployeeCreate() {
   const { t } = useTranslation();
-  const { branches, departments, designations, documentTypes, shifts, attendancePolicies } = usePage().props as any;
+  const { branches, departments, designations, documentTypes, shifts, attendancePolicies, employees } = usePage().props as any;
   
   // State
   const [formData, setFormData] = useState<Record<string, any>>({
@@ -34,6 +34,7 @@ export default function EmployeeCreate() {
     designation_id: '',
     shift_id: '',
     attendance_policy_id: '',
+    approver_id: '',
     date_of_joining: '',
     employment_type: 'Full-time',
     employment_status: 'active',
@@ -534,10 +535,30 @@ export default function EmployeeCreate() {
                     </Select>
                     {errors.attendance_policy_id && <p className="text-red-500 text-xs">{errors.attendance_policy_id}</p>}
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="approver_id">{t('Leave Approver')}</Label>
+                    <Select
+                      value={formData.approver_id || 'none'}
+                      onValueChange={(value) => handleChange('approver_id', value === 'none' ? '' : value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('Select Approver (Optional)')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">{t('No Approver')}</SelectItem>
+                        {employees?.map((emp: any) => (
+                          <SelectItem key={emp.id} value={emp.id.toString()}>
+                            {emp.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
         </Card>
-        
+
         {/* Contact Information Card */}
         <Card>
               <CardHeader>

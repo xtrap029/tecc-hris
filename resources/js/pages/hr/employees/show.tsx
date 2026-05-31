@@ -303,6 +303,10 @@ export default function EmployeeShow() {
                       <h4 className="text-sm font-medium text-muted-foreground">{t('Attendance Policy')}</h4>
                       <p>{employee.employee?.attendance_policy?.name || '-'}</p>
                     </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground">{t('Leave Approver')}</h4>
+                      <p>{employee.employee?.approver?.name || '-'}</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

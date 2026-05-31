@@ -18,7 +18,7 @@ import { getImagePath } from '@/utils/helpers';
 
 export default function EmployeeEdit() {
   const { t } = useTranslation();
-  const { employee, branches, departments, designations, documentTypes, shifts, attendancePolicies } = usePage().props as any;
+  const { employee, branches, departments, designations, documentTypes, shifts, attendancePolicies, employees } = usePage().props as any;
   
   // State
   const [formData, setFormData] = useState<Record<string, any>>({
@@ -34,6 +34,7 @@ export default function EmployeeEdit() {
     designation_id: employee.employee?.designation_id ? employee.employee.designation_id.toString() : '',
     shift_id: employee.employee?.shift_id ? employee.employee.shift_id.toString() : '',
     attendance_policy_id: employee.employee?.attendance_policy_id ? employee.employee.attendance_policy_id.toString() : '',
+    approver_id: employee.employee?.approver_id ? employee.employee.approver_id.toString() : '',
     date_of_joining: employee.employee?.date_of_joining || '',
     employment_type: employee.employee?.employment_type || 'Full-time',
     employment_status: employee.employee?.employment_status || 'active',
@@ -563,10 +564,30 @@ export default function EmployeeEdit() {
                     </Select>
                     {errors.attendance_policy_id && <p className="text-red-500 text-xs">{errors.attendance_policy_id}</p>}
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="approver_id">{t('Leave Approver')}</Label>
+                    <Select
+                      value={formData.approver_id || 'none'}
+                      onValueChange={(value) => handleChange('approver_id', value === 'none' ? '' : value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('Select Approver (Optional)')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">{t('No Approver')}</SelectItem>
+                        {employees?.map((emp: any) => (
+                          <SelectItem key={emp.id} value={emp.id.toString()}>
+                            {emp.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
         </Card>
-        
+
         {/* Contact Information Card */}
         <Card>
               <CardHeader>
