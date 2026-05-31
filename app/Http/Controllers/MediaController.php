@@ -22,7 +22,14 @@ class MediaController extends Controller
         $user = auth()->user();
         $directoryId = request('directory_id');
 
-        $mediaQuery = Media::WithPermissionCheck();
+        $mediaQuery = Media::query();
+        if ($user->type !== 'superadmin') {
+            if ($user->hasRole('company') || $user->hasPermissionTo('manage-any-media')) {
+                $mediaQuery->whereIn('created_by', getCompanyAndUsersId());
+            } else {
+                $mediaQuery->where('created_by', $user->id);
+            }
+        }
 
         // Filter by directory
         if ($directoryId) {
@@ -261,7 +268,14 @@ class MediaController extends Controller
     public function download($id)
     {
         $user = auth()->user();
-        $query = Media::WithPermissionCheck()->where('id', $id);
+        $query = Media::query()->where('id', $id);
+        if ($user->type !== 'superadmin') {
+            if ($user->hasRole('company') || $user->hasPermissionTo('manage-any-media')) {
+                $query->whereIn('created_by', getCompanyAndUsersId());
+            } else {
+                $query->where('created_by', $user->id);
+            }
+        }
 
         $media = $query->first();
 
